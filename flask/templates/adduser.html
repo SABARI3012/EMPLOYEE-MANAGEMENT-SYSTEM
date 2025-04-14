@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>crud app</title>
+	<link rel='stylesheet' href="{{url_for('static',filename='form.css')}}">
+</head>
+<body>
+<h1>Add Employee Details</h1>
+
+<form action='' method='post'>
+<label for='n'>NAME :</label>
+<input type='text' name='name' id='n' required autocomplete="off"><br><br>
+<label for='a'>AGE :</label>
+<input type='text' name='age' id='a' required autocomplete="off"><br><br>
+<label for='c'>CITY :</label>
+<input type='text' name='city' id='c' required autocomplete="off"><br><br>
+<input type='submit' value='Save Details'>
+</form>
+</body>
+</html>

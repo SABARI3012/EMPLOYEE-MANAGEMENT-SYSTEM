@@ -1,0 +1,537 @@
+To create the Angular 16 project as described, follow these steps:
+
+1. Create the Angular Project:
+Open your terminal, and create a new Angular 16 project named "FAM" by running the following commands:
+
+bash
+Copy
+
+ng new fam
+cd fam
+
+During the creation, you'll be prompted for configurations like routing and stylesheet format. Choose the defaults or as per your preference.
+
+2. Install Dependencies:
+To manage data in JSON format, we can use a simple Angular service. However, for storage purposes (like persisting data in a simple structure), we can use a mock JSON file.
+
+Since Angular doesn't use any backend, we'll handle data within the service (mock JSON).
+
+3. Generate Components:
+We'll need four components: Home, Grocery List, Expense Tracker, Wishlist, and Plans. Use the Angular CLI to generate these:
+
+bash
+Copy
+
+ng generate component home
+ng generate component grocery-list
+ng generate component expense-tracker
+ng generate component wishlist
+ng generate component plans
+
+
+4. Set Up the Home Page:
+Go to src/app/home/home.component.html and create a basic structure for the homepage with the four options:
+
+html
+Copy
+<h1>FAM</h1>
+<div class="home-options">
+  <button routerLink="/grocery-list">Grocery List</button>
+  <button routerLink="/expense-tracker">Expense Tracker</button>
+  <button routerLink="/wishlist">Wishlist</button>
+  <button routerLink="/plans">Plans</button>
+</div>
+5. Set Up Routing:
+In src/app/app-routing.module.ts, configure routes for the pages:
+
+typescript
+Copy
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { GroceryListComponent } from './grocery-list/grocery-list.component';
+import { ExpenseTrackerComponent } from './expense-tracker/expense-tracker.component';
+import { WishlistComponent } from './wishlist/wishlist.component';
+import { PlansComponent } from './plans/plans.component';
+
+const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'grocery-list', component: GroceryListComponent },
+  { path: 'expense-tracker', component: ExpenseTrackerComponent },
+  { path: 'wishlist', component: WishlistComponent },
+  { path: 'plans', component: PlansComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+6. Set Up the JSON Service:
+Now, let's set up a simple service to handle data storage (in a mock JSON-like structure).
+
+Create a service to manage all your data:
+
+bash
+Copy
+ng generate service data
+In src/app/data.service.ts:
+
+typescript
+Copy
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+  private groceryList: any[] = [];
+  private expenseList: any[] = [];
+  private wishlist: any[] = [];
+  private plans: any[] = [];
+
+  constructor() {}
+
+  // Grocery List methods
+  getGroceryList() {
+    return this.groceryList;
+  }
+
+  addGrocery(item: any) {
+    this.groceryList.push(item);
+  }
+
+  deleteGrocery(index: number) {
+    this.groceryList.splice(index, 1);
+  }
+
+  deleteAllGroceries() {
+    this.groceryList = [];
+  }
+
+  // Expense Tracker methods
+  getExpenses() {
+    return this.expenseList;
+  }
+
+  addExpense(expense: any) {
+    this.expenseList.push(expense);
+  }
+
+  deleteExpense(index: number) {
+    this.expenseList.splice(index, 1);
+  }
+
+  deleteAllExpenses() {
+    this.expenseList = [];
+  }
+
+  // Wishlist methods
+  getWishlist() {
+    return this.wishlist;
+  }
+
+  addToWishlist(item: any) {
+    this.wishlist.push(item);
+  }
+
+  deleteFromWishlist(index: number) {
+    this.wishlist.splice(index, 1);
+  }
+
+  deleteAllWishlist() {
+    this.wishlist = [];
+  }
+
+  // Plans methods
+  getPlans() {
+    return this.plans;
+  }
+
+  addPlan(plan: any) {
+    this.plans.push(plan);
+  }
+
+  deletePlan(index: number) {
+    this.plans.splice(index, 1);
+  }
+
+  deleteAllPlans() {
+    this.plans = [];
+  }
+}
+7. Grocery List Page:
+In src/app/grocery-list/grocery-list.component.ts, define the logic for adding and removing items:
+
+typescript
+Copy
+import { Component } from '@angular/core';
+import { DataService } from '../data.service';
+
+@Component({
+  selector: 'app-grocery-list',
+  templateUrl: './grocery-list.component.html',
+  styleUrls: ['./grocery-list.component.css']
+})
+export class GroceryListComponent {
+  groceryName = '';
+  groceryQuantity = '';
+  groceryList = this.dataService.getGroceryList();
+
+  constructor(private dataService: DataService) {}
+
+  addItem() {
+    if (this.groceryName && this.groceryQuantity) {
+      this.dataService.addGrocery({
+        name: this.groceryName,
+        quantity: this.groceryQuantity
+      });
+      this.groceryName = '';
+      this.groceryQuantity = '';
+    }
+  }
+
+  deleteItem(index: number) {
+    this.dataService.deleteGrocery(index);
+  }
+
+  deleteAll() {
+    this.dataService.deleteAllGroceries();
+  }
+}
+In src/app/grocery-list/grocery-list.component.html, create the form and display the list:
+
+html
+Copy
+<h1>Grocery List</h1>
+<div>
+  <input [(ngModel)]="groceryName" placeholder="Name" />
+  <input [(ngModel)]="groceryQuantity" placeholder="Quantity" />
+  <button (click)="addItem()">Add</button>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Quantity</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of groceryList; let i = index">
+      <td>{{ item.name }}</td>
+      <td>{{ item.quantity }}</td>
+      <td><button (click)="deleteItem(i)">Delete</button></td>
+    </tr>
+  </tbody>
+</table>
+<button (click)="deleteAll()">Delete All</button>
+8. Expense Tracker Page:
+In src/app/expense-tracker/expense-tracker.component.ts, define the logic for expense tracking:
+
+typescript
+Copy
+import { Component } from '@angular/core';
+import { DataService } from '../data.service';
+
+@Component({
+  selector: 'app-expense-tracker',
+  templateUrl: './expense-tracker.component.html',
+  styleUrls: ['./expense-tracker.component.css']
+})
+export class ExpenseTrackerComponent {
+  reason = '';
+  amount = '';
+  date = '';
+  expenseList = this.dataService.getExpenses();
+
+  constructor(private dataService: DataService) {}
+
+  addExpense() {
+    if (this.reason && this.amount && this.date) {
+      this.dataService.addExpense({
+        reason: this.reason,
+        amount: this.amount,
+        date: this.date
+      });
+      this.reason = '';
+      this.amount = '';
+      this.date = '';
+    }
+  }
+
+  deleteExpense(index: number) {
+    this.dataService.deleteExpense(index);
+  }
+
+  deleteAll() {
+    this.dataService.deleteAllExpenses();
+  }
+}
+In src/app/expense-tracker/expense-tracker.component.html, create the form and display the expense list:
+
+html
+Copy
+<h1>Expense Tracker</h1>
+<div>
+  <input [(ngModel)]="reason" placeholder="Reason" />
+  <input [(ngModel)]="amount" placeholder="Amount" />
+  <input [(ngModel)]="date" placeholder="Date" />
+  <button (click)="addExpense()">Add</button>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Reason</th>
+      <th>Amount</th>
+      <th>Date</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let expense of expenseList; let i = index">
+      <td>{{ expense.reason }}</td>
+      <td>{{ expense.amount }}</td>
+      <td>{{ expense.date }}</td>
+      <td><button (click)="deleteExpense(i)">Delete</button></td>
+    </tr>
+  </tbody>
+</table>
+<button (click)="deleteAll()">Delete All</button>
+9. Wishlist Page & Plans Page:
+The implementation of the Wishlist and Plans pages follows the same pattern as Grocery List and Expense Tracker with appropriate form fields and table displays.
+
+10. Running the Application:
+Finally, run the Angular application by typing:
+
+bash
+Copy
+ng serve
+Go to http://localhost:4200/ in your browser to see the app in action!
+
+This covers all the main points: a home page, individual pages for each feature, forms, tables, and actions (add, delete, delete all) with a mock data service. You can further improve this project by persisting data, adding validations, and enhancing the UI with Angular Material or CSS.
+
+Certainly! Below are the implementations for the Wishlist and Plans pages, which will follow the same structure as the Grocery List and Expense Tracker pages.
+
+1. Wishlist Page
+wishlist.component.ts
+In this file, we handle the logic for adding items to the wishlist and managing the list (add, delete, delete all).
+
+typescript
+Copy
+import { Component } from '@angular/core';
+import { DataService } from '../data.service';
+
+@Component({
+  selector: 'app-wishlist',
+  templateUrl: './wishlist.component.html',
+  styleUrls: ['./wishlist.component.css']
+})
+export class WishlistComponent {
+  itemName = '';
+  itemQuantity = '';
+  wishlist = this.dataService.getWishlist();
+
+  constructor(private dataService: DataService) {}
+
+  addItem() {
+    if (this.itemName && this.itemQuantity) {
+      this.dataService.addToWishlist({
+        name: this.itemName,
+        quantity: this.itemQuantity
+      });
+      this.itemName = '';
+      this.itemQuantity = '';
+    }
+  }
+
+  deleteItem(index: number) {
+    this.dataService.deleteFromWishlist(index);
+  }
+
+  deleteAll() {
+    this.dataService.deleteAllWishlist();
+  }
+}
+wishlist.component.html
+In this file, we create the form for adding wishlist items and display the list in a table format.
+
+html
+Copy
+<h1>Wishlist</h1>
+<div>
+  <input [(ngModel)]="itemName" placeholder="Item Name" />
+  <input [(ngModel)]="itemQuantity" placeholder="Quantity" />
+  <button (click)="addItem()">Add</button>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Item Name</th>
+      <th>Quantity</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of wishlist; let i = index">
+      <td>{{ item.name }}</td>
+      <td>{{ item.quantity }}</td>
+      <td><button (click)="deleteItem(i)">Delete</button></td>
+    </tr>
+  </tbody>
+</table>
+<button (click)="deleteAll()">Delete All</button>
+2. Plans Page
+plans.component.ts
+In this file, we handle the logic for adding plans and managing the list (add, delete, delete all).
+
+typescript
+Copy
+import { Component } from '@angular/core';
+import { DataService } from '../data.service';
+
+@Component({
+  selector: 'app-plans',
+  templateUrl: './plans.component.html',
+  styleUrls: ['./plans.component.css']
+})
+export class PlansComponent {
+  planName = '';
+  planDate = '';
+  planTime = '';
+  plans = this.dataService.getPlans();
+
+  constructor(private dataService: DataService) {}
+
+  addPlan() {
+    if (this.planName && this.planDate && this.planTime) {
+      this.dataService.addPlan({
+        name: this.planName,
+        date: this.planDate,
+        time: this.planTime
+      });
+      this.planName = '';
+      this.planDate = '';
+      this.planTime = '';
+    }
+  }
+
+  deletePlan(index: number) {
+    this.dataService.deletePlan(index);
+  }
+
+  deleteAll() {
+    this.dataService.deleteAllPlans();
+  }
+}
+plans.component.html
+In this file, we create the form for adding plans and display the list in a table format.
+
+html
+Copy
+<h1>Plans</h1>
+<div>
+  <input [(ngModel)]="planName" placeholder="Plan Name" />
+  <input [(ngModel)]="planDate" placeholder="Date" type="date" />
+  <input [(ngModel)]="planTime" placeholder="Time" type="time" />
+  <button (click)="addPlan()">Add</button>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Plan Name</th>
+      <th>Date</th>
+      <th>Time</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let plan of plans; let i = index">
+      <td>{{ plan.name }}</td>
+      <td>{{ plan.date }}</td>
+      <td>{{ plan.time }}</td>
+      <td><button (click)="deletePlan(i)">Delete</button></td>
+    </tr>
+  </tbody>
+</table>
+<button (click)="deleteAll()">Delete All</button>
+3. Update app-routing.module.ts
+Ensure that the routes for the Wishlist and Plans pages are correctly defined in your routing module (src/app/app-routing.module.ts).
+
+typescript
+Copy
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { GroceryListComponent } from './grocery-list/grocery-list.component';
+import { ExpenseTrackerComponent } from './expense-tracker/expense-tracker.component';
+import { WishlistComponent } from './wishlist/wishlist.component';
+import { PlansComponent } from './plans/plans.component';
+
+const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'grocery-list', component: GroceryListComponent },
+  { path: 'expense-tracker', component: ExpenseTrackerComponent },
+  { path: 'wishlist', component: WishlistComponent },
+  { path: 'plans', component: PlansComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+4. CSS Styling (Optional)
+You can add some basic CSS for styling the pages. For example:
+
+home.component.css
+css
+Copy
+.home-options button {
+  margin: 10px;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.home-options button:hover {
+  background-color: #45a049;
+}
+grocery-list.component.css, expense-tracker.component.css, wishlist.component.css, plans.component.css
+For each of these components, you can add similar CSS styling. Here's an example for grocery-list.component.css:
+
+css
+Copy
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+button {
+  background-color: #f44336;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #e53935;
+}
+5. Running the Application
+Make sure that your Angular application is still running after you've added the Wishlist and Plans pages:
+
+bash
+Copy
+ng serve
+Now, navigate to http://localhost:4200/ and check out the Home page. You should be able to go to the Grocery List, Expense Tracker, Wishlist, and Plans pages, add, view, and delete items, and manage your data.
+
+This covers all the functionality for the Wishlist and Plans pages. The data is managed via the DataService, and each page has a similar layout and functionality to the Grocery List and Expense Tracker.

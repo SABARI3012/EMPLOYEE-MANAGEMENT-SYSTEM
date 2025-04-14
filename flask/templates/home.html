@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>crud app</title>
+	<link rel='stylesheet' href="{{url_for('static',filename='style.css')}}">
+</head>
+<body>
+<h1>Employee Details Management</h1>
+<h2>Employee Details</h2>
+<br><br><br>
+<h4>
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			{% for message in messages %}
+				{{ message }}
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+</h4>
+
+<p><a href="{{url_for('adduser')}}">Add Employee</a></p>
+<table>
+<tr>
+<th>Id</th>
+<th>Name</th>
+<th>Age</th>
+<th>city</th>
+<th>Edit</th>
+<th >Delete</th>
+</tr>
+{% for data in datas %}
+<tr>
+<td>{{data.id}}</td>
+<td>{{data.name}}</td>
+<td>{{data.age}}</td>
+<td>{{data.city}}</td>
+<td id='e'><a href="{{url_for('edituser',id=data.id)}}">Edit</a></td>
+<td id='de'><a onclick="return confirm('Do you want to Delete?');" href="{{url_for('deleteuser',id=data.id)}}">Delete</a></td>
+</tr>
+{% endfor %}
+</table>
+</body>
+</html>
